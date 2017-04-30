@@ -1,0 +1,19 @@
+body {
+    background-color: lightblue;
+}
+
+div.endpoint{
+	border-width : 5px;
+}
+
+div.endpoint_state_online{
+	background-color: green;
+}
+
+div.endpoint_state_offline{
+	background-color: green;
+}
+
+div.endpoint_state_unknown{
+	background-color: white;
+}
