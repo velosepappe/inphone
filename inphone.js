@@ -64,16 +64,18 @@ function updateStatus(){
 function render(){
 	var items = [];
 	$.each( endpoints, function( key, val ) {
-		items.push( "<div id='" + val.resource + "' class='endpoint endpoint_state_" + val.state + "'>" + val.resource + " : " + val.state + " (" + val.channel_ids.length + ") " + "</div>" );
+		var endpointActive = val.channel_ids.length > 0?"active":"inactive";
+		var endpointHtml = "<div id='" + val.resource + "' class='endpoint'>" + val.resource + " :  (" + val.channel_ids.length + ")<div class='endpoint_state " + val.state + "'>" + val.state + "</div><div class='endpoint_activitystatus " + endpointActive + "'>" + val.channel_ids.length + "</div><div class='volumemeter'><img src='volume.png' height='60'></img></div><div class='button mute'>mute</div></div>" ;
+		items.push(endpointHtml);
 	});
- 
+  $("#endpointList").remove();
   $( "<div/>", {
     "id": "endpointList",
     html: items.join( "" )
   }).appendTo( "div#main" );
 }
 
-$(document).ready(function(){	
+$(document).ready(function(){
 	updateStatus();
-	//render();
+	window.setInterval(function(){updateStatus()}, 5000);
 });

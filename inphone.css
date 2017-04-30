@@ -3,18 +3,69 @@ body {
 }
 
 div.endpoint{
-	border-width : 5px;
-	border-color : black;
+    width: 300px;
+    border: 2px solid black;
+    padding: 25px;
+    margin: 25px;
+	background-color:white;
 }
 
-div.endpoint_state_online{
+div.endpoint_state {
+	width: 10px;
+    border: 2px solid black;
+    padding: 5px;
+    margin: 5px;
+}	
+div.endpoint_activitystatus{
+	width: 10px;
+    border: 2px solid black;
+    padding: 5px;
+    margin: 5px;
+}
+
+div.endpoint_state.online{
 	background-color: green;
 }
 
-div.endpoint_state_offline{
-	background-color: green;
+div.endpoint_state.offline{
+	background-color: red;
 }
 
-div.endpoint_state_unknown{
+div.endpoint_state.unknown{
 	background-color: white;
+}
+
+div.endpoint_activitystatus.active{
+	background-color:green;
+}
+div.endpoint_activitystatus.inactive{
+	background-color:red;
+}
+
+.button{
+ display: inline-block;
+ border:1px solid #4DB6EB;
+ color: #317596;
+ border-radius: 12px;
+ -webkit-border-radius: 12px;
+ -moz-border-radius: 12px;
+ font-family: Verdana;
+ width: auto;
+ height: auto;
+ font-size: 16px;
+ padding: 10px 40px;
+ box-shadow: inset 0px 0px 1px 0 #FCFCFC;
+ -moz-box-shadow: inset 0px 0px 1px 0 #FCFCFC;
+ -webkit-box-shadow: inset 0px 0px 1px 0 #FCFCFC;
+ text-shadow: 1px 1px 1px #C1E2FB;
+ background-image: linear-gradient(to top, #4FBCF2, #53C6FF);
+ background-color: #52C3FB;
+}
+.button:hover, .button:active{
+ border:1px solid #46D4D9;
+ color: #317596;
+ box-shadow: inset 0px 2px 9px 0 #3989B0;
+ -moz-box-shadow: inset 0px 2px 9px 0 #3989B0;
+ -webkit-box-shadow: inset 0px 2px 9px 0 #3989B0;
+ background-color: #52C3FB;
 }
