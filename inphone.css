@@ -4,6 +4,7 @@ body {
 
 div.endpoint{
 	border-width : 5px;
+	border-color : black;
 }
 
 div.endpoint_state_online{

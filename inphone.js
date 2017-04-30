@@ -3,7 +3,7 @@ function someCallback (data) {
 };
 
 var endpoints;
-function getEndpointStatus(){
+function getDemoEndpointStatus(){
 	var demoEndpoints = [
 	  {
 		"technology": "SIP",
@@ -39,11 +39,32 @@ function getEndpointStatus(){
 	return demoEndpoints;
 }
 
+function getEndpointStatus(){
+	var endpointStatus = null;
+	$.getJSON({
+		url: "http://vanloocke.synology.me:8088/ari/endpoints",
+		data: {
+			'api_key': 'samme:demo'
+		},
+		success: function(data){
+			endpoints = data;
+			render();
+		},
+		error: function(xhr, status, error) {
+			console.log(status + '; ' + error);
+		}
+	});
+	
+	return endpointStatus;
+}
+
 function updateStatus(){
-	endpoints = getEndpointStatus();
-	  var items = [];
+	getEndpointStatus();
+}
+function render(){
+	var items = [];
 	$.each( endpoints, function( key, val ) {
-		items.push( "<div id='" + val.resource + "' class='endpoint endpoint_state_" + val.state + "'>" + val.resource + " : " + val.state + "</div>" );
+		items.push( "<div id='" + val.resource + "' class='endpoint endpoint_state_" + val.state + "'>" + val.resource + " : " + val.state + " (" + val.channel_ids.length + ") " + "</div>" );
 	});
  
   $( "<div/>", {
@@ -52,20 +73,7 @@ function updateStatus(){
   }).appendTo( "div#main" );
 }
 
-$(document).ready(function(){
-	console.log("Work allready!");
-
-	$.ajax({
-	  url: "http://vanloocke.synology.me:8088/ari/endpoints",
-		data: {
-			'api_key': 'samme:demo'
-		},
-	  dataType: 'json',
-	  result:someCallback,
-		error: function(xhr, status, error) {
-			console.log(status + '; ' + error);
-		}
-	});
-	
+$(document).ready(function(){	
 	updateStatus();
+	//render();
 });
