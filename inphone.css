@@ -69,3 +69,15 @@ div.endpoint_activitystatus.inactive{
  -webkit-box-shadow: inset 0px 2px 9px 0 #3989B0;
  background-color: #52C3FB;
 }
+
+.mutable .button.mute{
+	border-color:yellow;
+	animation: blink-animation 1s linear infinite;
+}
+
+@keyframes blink-animation {
+  50% { 
+	color:yellow;
+	border-color:red;
+	}
+}
