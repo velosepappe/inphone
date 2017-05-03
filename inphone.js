@@ -1,8 +1,8 @@
 $(document).ready(function(){
 	updateStatus();
-	silenceTresholdExcededEvent("sam");
+	silenceThresholdExcededEvent("sam");
 	window.setInterval(function(){updateStatus()}, 5000);
-	window.setInterval(function(){silenceTresholdExcededEvent("sam")}, 12000);
+	window.setInterval(function(){silenceThresholdExcededEvent("sam")}, 12000);
 });
 
 var endpoints;
@@ -31,15 +31,6 @@ function getEndpointStatus(){
 	return endpointStatus;
 }
 
-function applyMutableModifier(resource, mute){
-	if(mute){
-		$("div.endpoint#"+resource).addClass("mutable");
-	}
-	else{
-		$("div.endpoint#"+resource).removeClass("mutable");
-	}
-}
-
 function refresh(){
 	$("#endpointList").empty();
 	$.each( endpoints, function(index, endpoint ) {
@@ -48,8 +39,8 @@ function refresh(){
 	});
 	
 	$.each( endpointModifiers, function(index, endpointModifierList){
-		if(endpointModifierList.silenceTresholdExceded != null){
-			applyMutableModifier(endpointModifierList.resource, endpointModifierList.silenceTresholdExceded);
+		if(endpointModifierList.silenceThresholdExceded != null){
+			applyMutableModifier(endpointModifierList.resource, endpointModifierList.silenceThresholdExceded);
 		}
 	});
 }
@@ -88,18 +79,27 @@ function createEndpointMuteButtonElement(endpoint){
 	return buttonElement;
 }
 
-function silenceTresholdExcededEvent(endpointResource){
+function silenceThresholdExcededEvent(endpointResource){
 	setMuteModifier(endpointResource, true);
 }
 
 function setMuteModifier(endpointResource, mute){
 	var endpoints = $.grep(endpointModifiers, function(e){ return e.resource == endpointResource; });
 	if(endpoints.length == 0){
-		var newEndpoint = {"silenceTresholdExceded":mute,"resource":endpointResource};
+		var newEndpoint = {"silenceThresholdExceded":mute,"resource":endpointResource};
 		endpointModifiers.push(newEndpoint);
 	}
 	else if(endpoints.length == 1) {
-		endpoints[0].silenceTresholdExceded=mute;
+		endpoints[0].silenceThresholdExceded=mute;
 	}
 	applyMutableModifier(endpointResource, mute);
+}
+
+function applyMutableModifier(resource, mute){
+	if(mute){
+		$("div.endpoint#"+resource).addClass("mutable");
+	}
+	else{
+		$("div.endpoint#"+resource).removeClass("mutable");
+	}
 }
