@@ -1,8 +1,6 @@
 $(document).ready(function(){
 	updateStatus();
-	silenceThresholdExcededEvent("sam");
 	window.setInterval(function(){updateStatus()}, 5000);
-	window.setInterval(function(){silenceThresholdExcededEvent("sam")}, 12000);
 });
 
 var endpoints;
@@ -21,6 +19,24 @@ function getEndpointStatus(){
 		},
 		success: function(data){
 			endpoints = data;
+			refresh();
+		},
+		error: function(xhr, status, error) {
+			console.log(status + '; ' + error);
+		}
+	});
+	
+	$.get({
+		url: "http://localhost:3000/",
+		success: function(data){
+			var endpointsOverTreshold = JSON.parse(data);
+			console.log(endpointsOverTreshold);
+			$.each( endpoints, function(index, endpoint ) {
+				var endpointTresholdStatus = endpointsOverTreshold[endpoint.resource];
+				if(endpointTresholdStatus != null){
+					setMuteModifier(endpoint.resource,endpointTresholdStatus);
+				}
+			});
 			refresh();
 		},
 		error: function(xhr, status, error) {
@@ -75,12 +91,12 @@ function createEndpointVolumeMeterElement(endpoint){
 }
 
 function createEndpointMuteButtonElement(endpoint){
-	var buttonElement = $( "<div/>",{"class":"button mute",html:"mute"}).click(function(){setMuteModifier(endpoint.resource, false)});
+	var buttonElement = $( "<div/>",{"class":"button mute",html:"mute"}).click(function(){
+		setMuteModifier(endpoint.resource, false);
+		$.post( "http://localhost:3000/"+endpoint.resource+"/acknowledge", function( data ) {
+		});
+	});
 	return buttonElement;
-}
-
-function silenceThresholdExcededEvent(endpointResource){
-	setMuteModifier(endpointResource, true);
 }
 
 function setMuteModifier(endpointResource, mute){
