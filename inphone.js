@@ -49,53 +49,95 @@ function getEndpointStatus(){
 
 function refresh(){
 	$("#endpointList").empty();
-	$.each( endpoints, function(index, endpoint ) {
-		var endpointElement = createEndpointElement(endpoint);
-		endpointElement.appendTo("#endpointList");
-	});
+	createEndpointTable().appendTo("#endpointList");
+	processModifiers();
+//	$.each( endpoints, function(index, endpoint ) {
+//		var endpointElement = createEndpointElement(endpoint);
+//		endpointElement.appendTo("#endpointList");
+//	});
 	
+//	$.each( endpointModifiers, function(index, endpointModifierList){
+//		if(endpointModifierList.silenceThresholdExceded != null){
+//			applyMutableModifier(endpointModifierList.resource, endpointModifierList.silenceThresholdExceded);
+//		}
+//	});
+}
+
+function createEndpointTable(){
+	var endpointTable = $("<table/>",{"class":"table"});
+	createTableHead().appendTo(endpointTable);
+	var body = createTableBody();
+	body.appendTo(endpointTable);
+	
+	
+	return endpointTable;
+}
+
+function processModifiers(){
 	$.each( endpointModifiers, function(index, endpointModifierList){
 		if(endpointModifierList.silenceThresholdExceded != null){
-			applyMutableModifier(endpointModifierList.resource, endpointModifierList.silenceThresholdExceded);
+			var endpointStatus = "success";
+			if(endpointModifierList.silenceThresholdExceded){
+				endpointStatus = "danger";
+				$("tr#"+endpointModifierList.resource + " .btn").addClass("btn-primary");
+			}
+			$("tr#"+endpointModifierList.resource).addClass(endpointStatus);
 		}
 	});
 }
 
-function createEndpointElement(endpoint){
-	var endpointElement = $( "<div/>",{"id":endpoint.resource,"class":"endpoint"});
-	createEndpointHeaderElement(endpoint).appendTo(endpointElement);
-	createEndpointStateElement(endpoint).appendTo(endpointElement);
-	createEndpointActivityStatusElement(endpoint).appendTo(endpointElement);
-	createEndpointVolumeMeterElement(endpoint).appendTo(endpointElement);
-	createEndpointMuteButtonElement(endpoint).appendTo(endpointElement);
-	return endpointElement;
+function createTableHead(){
+	return $("<thead/>").append(createHeadRow());
 }
 
-function createEndpointHeaderElement(endpoint){
-	return $( "<div/>",{"class":"header",html:endpoint.resource + " :  (" + endpoint.channel_ids.length + ")"});
+function createHeadRow(){
+	var tr = $("<tr/>");
+	tr.append($("<th/>",{html:"Naam"}));
+	tr.append($("<th/>",{html:"Status"}));
+	tr.append($("<th/>",{html:"Activiteit"}));
+	tr.append($("<th/>",{html:"Bevestig"}));
+	return tr;
 }
 
-function createEndpointStateElement(endpoint){
-	return $( "<div/>",{"class":"endpoint_state " + endpoint.state ,html:endpoint.state});
+function createTableBody(){
+	var tbody = $("<tbody/>");
+	$.each( endpoints, function(index, endpoint ) {
+		var endpointRow = createEndpointRow(endpoint);
+		tbody.append(endpointRow);
+	});
+	return tbody;
 }
 
-function createEndpointActivityStatusElement(endpoint){
+function createEndpointRow(endpoint){
+	var tr = $("<tr/>",{id:endpoint.resource});
+	tr.append(createEndpointHeaderColumn(endpoint));
+	tr.append(createEndpointStateColumn(endpoint));
+	tr.append(createEndpointActivityStatusColumn(endpoint));
+	tr.append(createEndpointMuteButtonColumn(endpoint));
+	return tr;
+}
+
+function createEndpointHeaderColumn(endpoint){
+	return $( "<td/>",{"class":"header",html:endpoint.resource});
+}
+
+function createEndpointStateColumn(endpoint){
+	return $( "<td/>",{"class":"endpoint_state " + endpoint.state ,html:endpoint.state});
+}
+
+function createEndpointActivityStatusColumn(endpoint){
 	var endpointActive = endpoint.channel_ids.length > 0?"active":"inactive";
-	return $( "<div/>",{"class":"endpoint_activitystatus " + endpointActive ,html:endpoint.channel_ids.length});
+	return $( "<td/>",{"class":"endpoint_activitystatus " + endpointActive ,html:endpoint.channel_ids.length});
 }
 
-function createEndpointVolumeMeterElement(endpoint){
-	var el = $( "<div/>",{"class":"volumemeter"});
-	$("<img/>",{src:"volume.png",height:"60"}).appendTo(el);
-	return el;
-}
-
-function createEndpointMuteButtonElement(endpoint){
-	var buttonElement = $( "<div/>",{"class":"button mute",html:"mute"}).click(function(){
+function createEndpointMuteButtonColumn(endpoint){
+	var buttonElement = $( "<td/>");
+	buttonElement.append($("<button/>",{"class":"btn",html:"OK"}).click(function(){
 		setMuteModifier(endpoint.resource, false);
 		$.post( "http://localhost:3000/"+endpoint.resource+"/acknowledge", function( data ) {
+			refresh();
 		});
-	});
+	}));
 	return buttonElement;
 }
 
@@ -107,15 +149,5 @@ function setMuteModifier(endpointResource, mute){
 	}
 	else if(endpoints.length == 1) {
 		endpoints[0].silenceThresholdExceded=mute;
-	}
-	applyMutableModifier(endpointResource, mute);
-}
-
-function applyMutableModifier(resource, mute){
-	if(mute){
-		$("div.endpoint#"+resource).addClass("mutable");
-	}
-	else{
-		$("div.endpoint#"+resource).removeClass("mutable");
 	}
 }

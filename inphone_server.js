@@ -24,11 +24,14 @@ const requestHandler = (request, response) => {
 		response.writeHead(200, {'Content-Type': 'text/plain'});
 		response.end(JSON.stringify(endpointsThreshold));
 	}
+	
+	// /{resource}/acknowledge
 	else if(request.method == 'POST' && fragments[2]!= null && fragments[2] == "acknowledge"){
 		console.log("Reset Endpoint Status " + fragments[1]);
 		var endpoint = fragments[1];
 		endpointsThreshold[endpoint] = false;
 		
+		//waarschijnlijk enkel response.end() nodig
 		response.setHeader('Access-Control-Allow-Origin', '*');
 		response.setHeader('Access-Control-Request-Method', '*');
 		response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET,POST');
