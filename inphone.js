@@ -51,39 +51,12 @@ function refresh(){
 	$("#endpointList").empty();
 	createEndpointTable().appendTo("#endpointList");
 	processModifiers();
-//	$.each( endpoints, function(index, endpoint ) {
-//		var endpointElement = createEndpointElement(endpoint);
-//		endpointElement.appendTo("#endpointList");
-//	});
-	
-//	$.each( endpointModifiers, function(index, endpointModifierList){
-//		if(endpointModifierList.silenceThresholdExceded != null){
-//			applyMutableModifier(endpointModifierList.resource, endpointModifierList.silenceThresholdExceded);
-//		}
-//	});
 }
 
 function createEndpointTable(){
 	var endpointTable = $("<table/>",{"class":"table"});
-	createTableHead().appendTo(endpointTable);
-	var body = createTableBody();
-	body.appendTo(endpointTable);
-	
-	
+	createTableHead().appendTo(endpointTable);createTableBody().appendTo(endpointTable);
 	return endpointTable;
-}
-
-function processModifiers(){
-	$.each( endpointModifiers, function(index, endpointModifierList){
-		if(endpointModifierList.silenceThresholdExceded != null){
-			var endpointStatus = "success";
-			if(endpointModifierList.silenceThresholdExceded){
-				endpointStatus = "danger";
-				$("tr#"+endpointModifierList.resource + " .btn").addClass("btn-primary");
-			}
-			$("tr#"+endpointModifierList.resource).addClass(endpointStatus);
-		}
-	});
 }
 
 function createTableHead(){
@@ -150,4 +123,17 @@ function setMuteModifier(endpointResource, mute){
 	else if(endpoints.length == 1) {
 		endpoints[0].silenceThresholdExceded=mute;
 	}
+}
+
+function processModifiers(){
+	$.each( endpointModifiers, function(index, endpointModifierList){
+		if(endpointModifierList.silenceThresholdExceded != null){
+			var endpointStatus = "success";
+			if(endpointModifierList.silenceThresholdExceded){
+				endpointStatus = "danger";
+				$("tr#"+endpointModifierList.resource + " .btn").addClass("btn-primary");
+			}
+			$("tr#"+endpointModifierList.resource).addClass(endpointStatus);
+		}
+	});
 }
