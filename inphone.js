@@ -30,7 +30,6 @@ function getEndpointStatus(){
 		url: "http://localhost:3000/",
 		success: function(data){
 			var endpointsOverTreshold = JSON.parse(data);
-			console.log(endpointsOverTreshold);
 			$.each( endpoints, function(index, endpoint ) {
 				var endpointTresholdStatus = endpointsOverTreshold[endpoint.resource];
 				if(endpointTresholdStatus != null){
@@ -83,34 +82,31 @@ function createTableBody(){
 
 function createEndpointRow(endpoint){
 	var tr = $("<tr/>",{id:endpoint.resource});
-	tr.append(createEndpointHeaderColumn(endpoint));
+	tr.append(createEndpointIdentifierColumn(endpoint));
 	tr.append(createEndpointStateColumn(endpoint));
 	tr.append(createEndpointActivityStatusColumn(endpoint));
 	tr.append(createEndpointMuteButtonColumn(endpoint));
+	if(endpoint.state == "online" && endpoint.channel_ids > 0){
+		tr.addClass("active");
+	}
 	return tr;
 }
 
-function createEndpointHeaderColumn(endpoint){
-	return $( "<td/>",{"class":"header",html:endpoint.resource});
+function createEndpointIdentifierColumn(endpoint){
+	return $( "<td/>",{"class":"endpoint_name",html:endpoint.resource});
 }
 
 function createEndpointStateColumn(endpoint){
-	return $( "<td/>",{"class":"endpoint_state " + endpoint.state ,html:endpoint.state});
+	return $( "<td/>",{"class":"endpoint_state",html:endpoint.state});
 }
 
 function createEndpointActivityStatusColumn(endpoint){
-	var endpointActive = endpoint.channel_ids.length > 0?"active":"inactive";
-	return $( "<td/>",{"class":"endpoint_activitystatus " + endpointActive ,html:endpoint.channel_ids.length});
+	return $( "<td/>",{"class":"endpoint_activitystatus" ,html:endpoint.channel_ids.length});
 }
 
 function createEndpointMuteButtonColumn(endpoint){
-	var buttonElement = $( "<td/>");
-	buttonElement.append($("<button/>",{"class":"btn",html:"OK"}).click(function(){
-		setMuteModifier(endpoint.resource, false);
-		$.post( "http://localhost:3000/"+endpoint.resource+"/acknowledge", function( data ) {
-			refresh();
-		});
-	}));
+	var buttonElement = $( "<td/>",{"class":"endpoint_acknowledge"});
+	buttonElement.append($("<button/>",{"class":"btn",html:"OK"}));
 	return buttonElement;
 }
 
@@ -127,13 +123,15 @@ function setMuteModifier(endpointResource, mute){
 
 function processModifiers(){
 	$.each( endpointModifiers, function(index, endpointModifierList){
-		if(endpointModifierList.silenceThresholdExceded != null){
-			var endpointStatus = "success";
-			if(endpointModifierList.silenceThresholdExceded){
-				endpointStatus = "danger";
-				$("tr#"+endpointModifierList.resource + " .btn").addClass("btn-primary");
-			}
-			$("tr#"+endpointModifierList.resource).addClass(endpointStatus);
+		if(endpointModifierList.silenceThresholdExceded != null && endpointModifierList.silenceThresholdExceded){
+			$("tr#"+endpointModifierList.resource + " .btn").addClass("btn-primary");
+			$("tr#"+endpointModifierList.resource + " .btn").click(function(){
+				setMuteModifier(endpointModifierList.resource, false);
+				$.post( "http://localhost:3000/"+ endpointModifierList.resource +"/acknowledge", function( data ) {
+					refresh();
+				});
+			});
+			$("tr#"+endpointModifierList.resource).removeClass("active").addClass("danger");
 		}
 	});
 }
