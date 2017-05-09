@@ -32,8 +32,11 @@ function getEndpointStatus(){
 			var endpointsOverTreshold = JSON.parse(data);
 			$.each( endpoints, function(index, endpoint ) {
 				var endpointTresholdStatus = endpointsOverTreshold[endpoint.resource];
-				if(endpointTresholdStatus != null){
-					setMuteModifier(endpoint.resource,endpointTresholdStatus);
+				if(endpointTresholdStatus != null && endpointTresholdStatus.state != null){
+					endpoint.talkState = endpointTresholdStatus.state;
+					endpoint.timestamp = endpointTresholdStatus.timestamp;
+					setMuteModifier(endpoint.resource,endpointTresholdStatus.state);
+					setTimestampModifier(endpoint.resource,endpointTresholdStatus.timestamp);
 				}
 			});
 			refresh();
@@ -68,6 +71,7 @@ function createHeadRow(){
 	tr.append($("<th/>",{html:"Status"}));
 	tr.append($("<th/>",{html:"Activiteit"}));
 	tr.append($("<th/>",{html:"Bevestig"}));
+	tr.append($("<th/>",{html:"Laatst actief"}));
 	return tr;
 }
 
@@ -86,6 +90,7 @@ function createEndpointRow(endpoint){
 	tr.append(createEndpointStateColumn(endpoint));
 	tr.append(createEndpointActivityStatusColumn(endpoint));
 	tr.append(createEndpointMuteButtonColumn(endpoint));
+	tr.append(createTimestampColumn(endpoint));
 	if(endpoint.state == "online" && endpoint.channel_ids > 0){
 		tr.addClass("active");
 	}
@@ -110,6 +115,10 @@ function createEndpointMuteButtonColumn(endpoint){
 	return buttonElement;
 }
 
+function createTimestampColumn(endpoint){
+	return $( "<td/>",{"class":"endpoint_timestamp"});
+}
+
 function setMuteModifier(endpointResource, mute){
 	var endpoints = $.grep(endpointModifiers, function(e){ return e.resource == endpointResource; });
 	if(endpoints.length == 0){
@@ -118,6 +127,17 @@ function setMuteModifier(endpointResource, mute){
 	}
 	else if(endpoints.length == 1) {
 		endpoints[0].silenceThresholdExceded=mute;
+	}
+}
+
+function setTimestampModifier(endpointResource, timestamp){
+	var endpoints = $.grep(endpointModifiers, function(e){ return e.resource == endpointResource; });
+	if(endpoints.length == 0){
+		var newEndpoint = {"timestamp":timestamp,"resource":endpointResource};
+		endpointModifiers.push(newEndpoint);
+	}
+	else if(endpoints.length == 1) {
+		endpoints[0].timestamp=timestamp;
 	}
 }
 
@@ -133,5 +153,12 @@ function processModifiers(){
 			});
 			$("tr#"+endpointModifierList.resource).removeClass("active").addClass("danger");
 		}
+		if(endpointModifierList.timestamp != null){
+			$("tr#"+endpointModifierList.resource+" .endpoint_timestamp").html(parseTime(endpointModifierList.timestamp));
+		}
 	});
+}
+
+function parseTime(timestamp){
+	return timestamp.split("T")[1].split(".")[0];
 }

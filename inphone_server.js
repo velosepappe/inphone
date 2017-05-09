@@ -29,7 +29,7 @@ const requestHandler = (request, response) => {
 	else if(request.method == 'POST' && fragments[2]!= null && fragments[2] == "acknowledge"){
 		console.log("Reset Endpoint Status " + fragments[1]);
 		var endpoint = fragments[1];
-		endpointsThreshold[endpoint] = false;
+		endpointsThreshold[endpoint].state = false;
 		
 		//waarschijnlijk enkel response.end() nodig
 		response.setHeader('Access-Control-Allow-Origin', '*');
@@ -75,7 +75,9 @@ function clientLoaded (err, client) {
   
     // handler for ChannelTalkingStarted event
   function channeltalkingstarted(event, channel) {
-	  endpointsThreshold[channel.caller.name] = true;
+	  endpointsThreshold[channel.caller.name]={};
+	  endpointsThreshold[channel.caller.name].state = true;
+	  endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
     console.log(util.format(
         'Channel talking started', channel.caller.name));
  
