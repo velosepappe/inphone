@@ -1,16 +1,23 @@
 /*jshint node:true*/
 'use strict';
  
-var ari = require('ari-client');
-var util = require('util');
-
 var endpointsThreshold = {};
- 
-ari.connect('http://vanloocke.synology.me:8088', 'asterisk', 'asterisk', clientLoaded);
+
+function registerNewEndpoint(name){
+	endpointsThreshold[name]={};
+	endpointsThreshold[name].name=name;
+}
+
+function registerNewEndpointIfNeeded(name){
+	if(!endpointsThreshold[name]){
+		registerNewEndpoint(name);
+	}
+}
 
 // content of index.js
 const http = require('http')  
 const port = 3000
+ 
 
 const requestHandler = (request, response) => {
 	var fragments = request.url.split("/");
@@ -44,8 +51,7 @@ const requestHandler = (request, response) => {
 		response.end();
 	}
 }
- 
- const server = http.createServer(requestHandler)
+const server = http.createServer(requestHandler)
 
 server.listen(port, (err) => {  
   if (err) {
@@ -55,8 +61,11 @@ server.listen(port, (err) => {
   console.log(`server is listening on ${port}`)
 })
 
-// Asterisk stuff
-// handler for client being loaded
+var ari = require('ari-client');
+var util = require('util');
+ 
+ari.connect('http://vanloocke.synology.me:8088', 'asterisk', 'asterisk', clientLoaded);
+
 function clientLoaded (err, client) {
   if (err) {
     throw err;
@@ -68,6 +77,9 @@ function clientLoaded (err, client) {
     } else {
       console.log('Current channels:');
       channels.forEach(function(channel) {
+		registerNewEndpoint(channel.caller.name);
+		endpointsThreshold[channel.caller.name].state = false;
+		endpointsThreshold[channel.caller.name].listening = true;
         console.log(channel.name);
       });
     }
@@ -75,40 +87,50 @@ function clientLoaded (err, client) {
   
     // handler for ChannelTalkingStarted event
   function channeltalkingstarted(event, channel) {
-	  endpointsThreshold[channel.caller.name]={};
-	  endpointsThreshold[channel.caller.name].state = true;
-	  endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
+	endpointsThreshold[channel.caller.name].state = true;
+	endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
     console.log(util.format(
         'Channel talking started', channel.caller.name));
  
   }
   
-  // handler for ChannelTalkingFinished event
   function channeltalkingfinished(event, channel) {
-    console.log(util.format(
+	endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
+	console.log(util.format(
         'Channel talking finished', channel.caller.name));
  
   }
+  
+  function channelStateChanged(event, channel) {
+	console.log(util.format(
+        'Channel state changed %s:%s', channel.caller.name,event));
  
-  // handler for StasisStart event
+  }
+ 
   function stasisStart(event, channel) {
     console.log(util.format(
         'Channel %s has entered the application', channel.name));
- 
+	
+	registerNewEndpointIfNeeded(channel.caller.name);
+	endpointsThreshold[channel.caller.name].listening = true;
     // use keys on event since channel will also contain channel operations
     Object.keys(event.channel).forEach(function(key) {
       console.log(util.format('%s: %s', key, JSON.stringify(channel[key])));
     });
   }
- 
-  // handler for StasisEnd event
+
+  //when this happens, would the channel even come up on channels.list afterward?
   function stasisEnd(event, channel) {
     console.log(util.format(
         'Channel %s has left the application', channel.name));
+	//?why register if not listening anymore?
+	registerNewEndpointIfNeeded(channel.caller.name);
+	endpointsThreshold[channel.caller.name].listening = false;
   }
   
   client.on('ChannelTalkingStarted', channeltalkingstarted)
   client.on('ChannelTalkingStarted', channeltalkingfinished)
+  client.on('ChannelStateChange', channelStateChanged)
   client.on('StasisStart', stasisStart);
   client.on('StasisEnd', stasisEnd);
  
