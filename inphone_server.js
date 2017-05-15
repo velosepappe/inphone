@@ -11,6 +11,8 @@ function registerNewEndpoint(name){
 function registerNewEndpointIfNeeded(name){
 	if(!endpointsThreshold[name]){
 		registerNewEndpoint(name);
+		endpointsThreshold[name].state = false;
+		endpointsThreshold[name].listening = false;
 	}
 }
 
@@ -70,18 +72,28 @@ function clientLoaded (err, client) {
   if (err) {
     throw err;
   }
- 
+  
+  client.endpoints.list(function(err,ep){
+	  if(ep.length){
+		  ep.forEach(function(endpoint){
+			registerNewEndpointIfNeeded(endpoint.resource);
+			console.log('Endpoint registered: ' + endpoint.resource);
+		  });
+	  }
+  });
+  
   client.channels.list(function(err, channels) {
-    if (!channels.length) {
-      console.log('No channels currently :-(');
-    } else {
-      console.log('Current channels:');
-      channels.forEach(function(channel) {
-		registerNewEndpoint(channel.caller.name);
-		endpointsThreshold[channel.caller.name].state = false;
-		endpointsThreshold[channel.caller.name].listening = true;
-        console.log(channel.name);
-      });
+    if (channels.length) {
+		channels.forEach(function(channel) {
+			var name = channel.caller.name;
+			if(name || name === ""){
+				name = channel.caller.number;
+			}
+			registerNewEndpointIfNeeded(name);
+			endpointsThreshold[name].state = false;
+			endpointsThreshold[name].listening = true;
+			console.log('Channel online: ' + name);
+		});
     }
   });
   
