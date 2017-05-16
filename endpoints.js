@@ -81,7 +81,7 @@ function createEndpointRow(endpoint){
 		tr.addClass("danger");
 	}
 	else if(endpoint.listening){
-		tr.addClass("active");
+		tr.addClass("success");
 	}
 	return tr;
 }
