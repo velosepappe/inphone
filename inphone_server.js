@@ -146,6 +146,5 @@ function clientLoaded (err, client) {
   client.on('StasisStart', stasisStart);
   client.on('StasisEnd', stasisEnd);
  
-  //client.start('channel-dump');
-  client.start('confbridge');
+  client.start('channel-dump');
 }
