@@ -24,7 +24,6 @@ const port = 3000
 const requestHandler = (request, response) => {
 	var fragments = request.url.split("/");
 	if(request.method == 'GET'){
-		console.log('Get Endpoint Status: ' + JSON.stringify(endpointsThreshold));
 		response.setHeader('Access-Control-Allow-Origin', '*');
 		response.setHeader('Access-Control-Request-Method', '*');
 		response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET,POST');
@@ -99,6 +98,7 @@ function clientLoaded (err, client) {
   
     // handler for ChannelTalkingStarted event
   function channeltalkingstarted(event, channel) {
+	registerNewEndpointIfNeeded(channel.caller.name);
 	endpointsThreshold[channel.caller.name].state = true;
 	endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
     console.log(util.format(
@@ -146,5 +146,6 @@ function clientLoaded (err, client) {
   client.on('StasisStart', stasisStart);
   client.on('StasisEnd', stasisEnd);
  
-  client.start('channel-dump');
+  //client.start('channel-dump');
+  client.start('confbridge');
 }

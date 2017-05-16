@@ -1,4 +1,5 @@
 var serverUrl = "http://localhost:3000/";
+var notificationSound = new Audio("268756__morrisjm__dingaling.mp3");
 var endpoints;
 
 $(document).ready(function(){
@@ -26,6 +27,13 @@ function getEndpointStatus(){
 function refresh(){
 	$("#endpointList").empty();
 	createEndpointTable().appendTo("#endpointList");
+	notifyIfNecessary();
+}
+
+function notifyIfNecessary(){
+	if($("tr.danger").length > 0){
+		notificationSound.play();
+	}
 }
 
 function createEndpointTable(){
