@@ -1,5 +1,7 @@
-var serverUrl = "http://localhost:3000/";
+var serverUrl = config.server.url;
+
 var notificationSound = new Audio("268756__morrisjm__dingaling.mp3");
+
 var endpoints;
 
 $(document).ready(function(){

@@ -1,5 +1,9 @@
-/*jshint node:true*/
-'use strict';
+
+const config = require('./config.js');
+const ari = require('ari-client');
+const util = require('util');
+const http = require('http') ;
+const port = config.server.port;
  
 var endpointsThreshold = {};
 
@@ -15,12 +19,7 @@ function registerNewEndpointIfNeeded(name){
 		endpointsThreshold[name].listening = false;
 	}
 }
-
-// content of index.js
-const http = require('http')  
-const port = 3000
  
-
 const requestHandler = (request, response) => {
 	var fragments = request.url.split("/");
 	if(request.method == 'GET'){
@@ -61,11 +60,8 @@ server.listen(port, (err) => {
 
   console.log(`server is listening on ${port}`)
 })
-
-var ari = require('ari-client');
-var util = require('util');
  
-ari.connect('http://vanloocke.synology.me:8088', 'asterisk', 'asterisk', clientLoaded);
+ari.connect(config.asterisk.url, config.asterisk.username, config.asterisk.password, clientLoaded);
 
 function clientLoaded (err, client) {
   if (err) {
