@@ -1,6 +1,6 @@
 var serverUrl = config.server.url;
 
-var notificationSound = new Audio("gentle-alarm.mp3");
+var notificationSound = new Audio("268756__morrisjm__dingaling.mp3");
 
 var endpoints;
 
