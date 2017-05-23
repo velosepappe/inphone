@@ -1,10 +1,11 @@
-
 const config = require('./config.js');
 const ari = require('ari-client');
 const util = require('util');
 const http = require('http') ;
 const port = config.server.port;
- 
+
+;var ari2 = require('./node-confbridge/lib/helpers/ari.js');
+var ConfBridge = require ('./node-confbridge/lib/confbridge.js') 
 var endpointsThreshold = {};
 
 function registerNewEndpoint(name){
@@ -67,6 +68,10 @@ function clientLoaded (err, client) {
   if (err) {
     throw err;
   }
+
+  console.log('initializing confbridge');
+
+  var confbridge = new ConfBridge(client);
   
   client.endpoints.list(function(err,ep){
 	  if(ep.length){
@@ -141,6 +146,7 @@ function clientLoaded (err, client) {
   client.on('ChannelStateChange', channelStateChanged)
   client.on('StasisStart', stasisStart);
   client.on('StasisEnd', stasisEnd);
- 
-  client.start('channel-dump');
+  
+  client.start('confbridge');
+
 }

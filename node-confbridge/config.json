@@ -1,0 +1,36 @@
+{
+  "ariConnection": {
+    "url": "http://localhost:8088",
+    "user": "asterisk",
+    "pass": "asterisk"
+  },
+  "dbConnection": "postgres://asterisk:Lateralus1@localhost/asterisk",
+  "bridgeProfile": "default",
+  "menuInput": {
+    "mute": "1",
+    "deafMute": "2",
+    "contInDialplan": "3",
+    "decLisVol": "4",
+    "resetLisVol": "5",
+    "incLisVol": "6",
+    "decTalkVol": "7",
+    "resetTalkVol": "8",
+    "incTalkVol": "9",
+    "pitchChange": "0",
+    "admin": "#"
+  },
+  "waitingInput": {
+    "verify": "#"
+  },
+  "adminInput": {
+    "toggleLock": "1",
+    "kick": "2",
+    "toggleRecord": "3",
+    "menu": "#"
+  },
+  "leaveConf": {
+    "context": "",
+    "extension": "",
+    "priority": ""
+  }
+}
