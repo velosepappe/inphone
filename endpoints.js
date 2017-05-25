@@ -33,7 +33,7 @@ function refresh(){
 }
 
 function notifyIfNecessary(){
-	if($("tr.danger").length > 0){
+	if(config.webapp.notificationSoundEnabled && $("tr.danger").length > 0){
 		notificationSound.play();
 	}
 }

@@ -4,7 +4,6 @@ const util = require('util');
 const http = require('http') ;
 const port = config.server.port;
 
-;var ari2 = require('./node-confbridge/lib/helpers/ari.js');
 var ConfBridge = require ('./node-confbridge/lib/confbridge.js') 
 var endpointsThreshold = {};
 
