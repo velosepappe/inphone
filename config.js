@@ -10,6 +10,9 @@ var config = {
 	},
 	"webserver" : {
 		"port" : "8080"
+	},
+	"webapp": {
+		"notificationSoundEnabled":false
 	}
 }
 

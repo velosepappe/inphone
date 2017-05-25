@@ -56,6 +56,7 @@ function createHeadRow(){
 	tr.append($("<th/>",{html:"Activiteit"}));
 	tr.append($("<th/>",{html:"Bevestig"}));
 	tr.append($("<th/>",{html:"Laatst actief"}));
+	tr.append($("<th/>",{html:"Geluid"}));
 	return tr;
 }
 
@@ -75,13 +76,21 @@ function createEndpointRow(endpoint){
 	tr.append(createEndpointIdentifierColumn(endpoint));
 	tr.append(createEndpointListeningStateColumn(endpoint));
 	tr.append(createEndpointActivityStatusColumn(endpoint));
-	tr.append(createEndpointMuteButtonColumn(endpoint));
+	tr.append(createEndpointAcknowledgeButtonColumn(endpoint));
 	tr.append(createTimestampColumn(endpoint));
-	if(endpoint.state){
-		tr.addClass("danger");
+	tr.append(createEndpointMuteButtonColumn(endpoint));
+	if(endpoint.talking){
+		if(endpoint.state){
+			tr.addClass("danger");
+		}
+		else if(endpoint.listening){
+			tr.addClass("success");
+		}
 	}
-	else if(endpoint.listening){
-		tr.addClass("success");
+	else{
+		if(endpoint.listening){
+			tr.addClass("info");
+		}
 	}
 	return tr;
 }
@@ -98,7 +107,7 @@ function createEndpointActivityStatusColumn(endpoint){
 	return $( "<td/>",{"class":"endpoint_activitystatus" ,html:endpoint.listening?1:0});
 }
 
-function createEndpointMuteButtonColumn(endpoint){
+function createEndpointAcknowledgeButtonColumn(endpoint){
 	var tdButton = $( "<td/>",{"class":"endpoint_acknowledge"});
 	var button = $("<button/>",{"class":"btn",html:"OK"}).appendTo(tdButton);
 	
@@ -107,6 +116,33 @@ function createEndpointMuteButtonColumn(endpoint){
 		button.click(function(){
 			endpoints[endpoint.name].state=false;
 			$.post( serverUrl + endpoint.name +"/acknowledge", function( data ) {
+				refresh();
+			});
+		});
+	}
+	return tdButton;
+}
+
+function createEndpointMuteButtonColumn(endpoint){
+	var tdButton = $( "<td/>",{"class":"endpoint_mute"});
+	var button = $("<button/>",{"class":"btn"}).appendTo(tdButton);
+	
+	if(endpoint.talking){
+		button.html("AAN");
+		button.addClass("btn-success");
+		button.click(function(){
+			endpoints[endpoint.name].talk=false;
+			$.post( serverUrl + endpoint.name +"/mute", function( data ) {
+				refresh();
+			});
+		});
+	}
+	else{
+		button.html("UIT");
+		button.addClass("btn-danger");
+		button.click(function(){
+			endpoints[endpoint.name].talk=false;
+			$.post( serverUrl + endpoint.name +"/talk", function( data ) {
 				refresh();
 			});
 		});

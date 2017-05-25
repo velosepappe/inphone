@@ -17,12 +17,47 @@ function registerNewEndpointIfNeeded(name){
 		registerNewEndpoint(name);
 		endpointsThreshold[name].state = false;
 		endpointsThreshold[name].listening = false;
+		endpointsThreshold[name].talking = true;
 	}
 }
  
 const requestHandler = (request, response) => {
 	var fragments = request.url.split("/");
+	var success  =false;
 	if(request.method == 'GET'){
+		success = true;
+	}
+	
+	// /{resource}/acknowledge
+	else if(fragments[2]!= null && fragments[2] == "acknowledge" && request.method == 'POST'){
+		console.log("Acknowledge endpoint " + fragments[1]);
+		var endpoint = fragments[1];
+		endpointsThreshold[endpoint].state = false;
+		
+		success  = true;
+	}
+	
+	// /{resource}/mute
+	else if(fragments[2]!= null && fragments[2] == "mute"){
+		var endpoint = fragments[1];
+		if(request.method == 'POST'){
+			endpointsThreshold[endpoint].talking = false;
+		}
+		console.log("Set endpoint " + fragments[1] + " talking status " + endpointsThreshold[endpoint].talking);
+		success = true;
+	}
+	
+	// /{resource}/talk
+	else if(fragments[2]!= null && fragments[2] == "talk"){
+		var endpoint = fragments[1];
+		if(request.method == 'POST'){
+			endpointsThreshold[endpoint].talking = true;
+		}
+		console.log("Set endpoint " + fragments[1] + " talking status " + endpointsThreshold[endpoint].talking);
+		success = true;
+	}
+	
+	if(success){
 		response.setHeader('Access-Control-Allow-Origin', '*');
 		response.setHeader('Access-Control-Request-Method', '*');
 		response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET,POST');
@@ -30,22 +65,6 @@ const requestHandler = (request, response) => {
 		response.setHeader('Content-Type', 'text/html');
 		response.writeHead(200, {'Content-Type': 'text/plain'});
 		response.end(JSON.stringify(endpointsThreshold));
-	}
-	
-	// /{resource}/acknowledge
-	else if(request.method == 'POST' && fragments[2]!= null && fragments[2] == "acknowledge"){
-		console.log("Reset Endpoint Status " + fragments[1]);
-		var endpoint = fragments[1];
-		endpointsThreshold[endpoint].state = false;
-		
-		//waarschijnlijk enkel response.end() nodig
-		response.setHeader('Access-Control-Allow-Origin', '*');
-		response.setHeader('Access-Control-Request-Method', '*');
-		response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET,POST');
-		response.setHeader('Access-Control-Allow-Headers', '*');
-		response.setHeader('Content-Type', 'text/html');
-		response.writeHead(200, {'Content-Type': 'text/plain'});
-		response.end();
 	}
 	else{
 		response.end();
@@ -80,7 +99,6 @@ function clientLoaded (err, client) {
 		  });
 	  }
   });
-  
   client.channels.list(function(err, channels) {
     if (channels.length) {
 		channels.forEach(function(channel) {
