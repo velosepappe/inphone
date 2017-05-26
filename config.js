@@ -13,6 +13,9 @@ var config = {
 	},
 	"webapp": {
 		"notificationSoundEnabled":false
+	},
+	"audience": {
+		"prefix":"AUD_"
 	}
 }
 

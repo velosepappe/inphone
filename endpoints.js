@@ -79,7 +79,10 @@ function createEndpointRow(endpoint){
 	tr.append(createEndpointActivityStatusColumn(endpoint));
 	tr.append(createEndpointAcknowledgeButtonColumn(endpoint));
 	tr.append(createTimestampColumn(endpoint));
-	if(endpoint.talking){
+	if(endpoint.audience){
+		tr.addClass("hidden");
+	}
+	else if(endpoint.talking){
 		if(endpoint.state){
 			tr.addClass("danger");
 		}

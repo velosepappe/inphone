@@ -9,6 +9,9 @@ var endpointsThreshold = {};
 
 function registerNewEndpoint(name){
 	endpointsThreshold[name]={};
+	if(config.audience.prefix && name.startsWith(config.audience.prefix)){
+		endpointsThreshold[name].audience=true;
+	}
 	endpointsThreshold[name].name=name;
 }
 

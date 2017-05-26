@@ -38,3 +38,7 @@ body {
   margin:auto;
   width: auto;
 }
+
+tr.hidden{
+	display:none;
+}
