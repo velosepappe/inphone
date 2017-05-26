@@ -51,12 +51,12 @@ function createTableHead(){
 
 function createHeadRow(){
 	var tr = $("<tr/>");
+	tr.append($("<th/>",{html:"Speaker"}));
 	tr.append($("<th/>",{html:"Naam"}));
 	tr.append($("<th/>",{html:"Status"}));
 	tr.append($("<th/>",{html:"Activiteit"}));
 	tr.append($("<th/>",{html:"Bevestig"}));
 	tr.append($("<th/>",{html:"Laatst actief"}));
-	tr.append($("<th/>",{html:"Geluid"}));
 	return tr;
 }
 
@@ -73,12 +73,12 @@ function createTableBody(){
 
 function createEndpointRow(endpoint){
 	var tr = $("<tr/>",{id:endpoint.name});
+	tr.append(createEndpointMuteButtonColumn(endpoint));
 	tr.append(createEndpointIdentifierColumn(endpoint));
 	tr.append(createEndpointListeningStateColumn(endpoint));
 	tr.append(createEndpointActivityStatusColumn(endpoint));
 	tr.append(createEndpointAcknowledgeButtonColumn(endpoint));
 	tr.append(createTimestampColumn(endpoint));
-	tr.append(createEndpointMuteButtonColumn(endpoint));
 	if(endpoint.talking){
 		if(endpoint.state){
 			tr.addClass("danger");
