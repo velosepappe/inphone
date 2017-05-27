@@ -106,10 +106,7 @@ function clientLoaded (err, client) {
   client.channels.list(function(err, channels) {
     if (channels.length) {
 		channels.forEach(function(channel) {
-			var name = channel.caller.name;
-			if(name || name === ""){
-				name = channel.caller.number;
-			}
+			var name = channel.caller.number;
 			registerNewEndpointIfNeeded(name);
 			endpointsThreshold[name].state = false;
 			endpointsThreshold[name].listening = true;
@@ -120,35 +117,35 @@ function clientLoaded (err, client) {
   
     // handler for ChannelTalkingStarted event
   function channeltalkingstarted(event, channel) {
-	registerNewEndpointIfNeeded(channel.caller.name);
-	endpointsThreshold[channel.caller.name].state = true;
-	endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
-	endpointsThreshold[channel.caller.name].talking = true;
+	registerNewEndpointIfNeeded(channel.caller.number);
+	endpointsThreshold[channel.caller.number].state = true;
+	endpointsThreshold[channel.caller.number].timestamp = event.timestamp;
+	endpointsThreshold[channel.caller.number].talking = true;
     console.log(util.format(
-        'Channel talking started', channel.caller.name));
+        'Channel talking started', channel.caller.number));
  
   }
   
   function channeltalkingfinished(event, channel) {
-	endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
-	endpointsThreshold[channel.caller.name].talking = false;
+	endpointsThreshold[channel.caller.number].timestamp = event.timestamp;
+	endpointsThreshold[channel.caller.number].talking = false;
 	console.log(util.format(
-        'Channel talking finished', channel.caller.name));
+        'Channel talking finished', channel.caller.number));
  
   }
   
   function channelStateChanged(event, channel) {
 	console.log(util.format(
-        'Channel state changed %s:%s', channel.caller.name,event));
+        'Channel state changed %s:%s', channel.caller.number,event));
  
   }
  
   function stasisStart(event, channel) {
     console.log(util.format(
-        'Channel %s has entered the application', channel.name));
+        'Channel %s has entered the application', channel.caller.number));
 	
-	registerNewEndpointIfNeeded(channel.caller.name);
-	endpointsThreshold[channel.caller.name].listening = true;
+	registerNewEndpointIfNeeded(channel.caller.number);
+	endpointsThreshold[channel.caller.number].listening = true;
     // use keys on event since channel will also contain channel operations
     Object.keys(event.channel).forEach(function(key) {
       console.log(util.format('%s: %s', key, JSON.stringify(channel[key])));
@@ -158,10 +155,10 @@ function clientLoaded (err, client) {
   //when this happens, would the channel even come up on channels.list afterward?
   function stasisEnd(event, channel) {
     console.log(util.format(
-        'Channel %s has left the application', channel.name));
+        'Channel %s has left the application', channel.caller.number));
 	//?why register if not listening anymore?
-	registerNewEndpointIfNeeded(channel.caller.name);
-	endpointsThreshold[channel.caller.name].listening = false;
+	registerNewEndpointIfNeeded(channel.caller.number);
+	endpointsThreshold[channel.caller.number].listening = false;
   }
   
   client.on('ChannelTalkingStarted', channeltalkingstarted)
