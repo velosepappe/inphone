@@ -82,7 +82,7 @@ function createEndpointRow(endpoint){
 	if(endpoint.audience){
 		tr.addClass("hidden");
 	}
-	else if(endpoint.talking){
+	else if(endpoint.speaker){
 		if(endpoint.state){
 			tr.addClass("danger");
 		}
@@ -130,7 +130,7 @@ function createEndpointMuteButtonColumn(endpoint){
 	var tdButton = $( "<td/>",{"class":"endpoint_mute"});
 	var button = $("<button/>",{"class":"btn"}).appendTo(tdButton);
 	
-	if(endpoint.talking){
+	if(endpoint.speaker){
 		button.html("AAN");
 		button.addClass("btn-success");
 		button.click(function(){
@@ -154,7 +154,13 @@ function createEndpointMuteButtonColumn(endpoint){
 }
 
 function createTimestampColumn(endpoint){
-	return $( "<td/>",{"class":"endpoint_timestamp",html:endpoint.timestamp?parseTime(endpoint.timestamp):""});
+	
+	var content = endpoint.timestamp?parseTime(endpoint.timestamp):"";
+	var td = $( "<td/>",{"class":"endpoint_timestamp",html:content});
+	if(endpoint.talking){
+		$("<td/>",{"class":"glyphicon glyphicon-bullhorn"}).appendTo(td);
+	}
+	return td;
 }
 
 function parseTime(timestamp){

@@ -4,7 +4,7 @@ const util = require('util');
 const http = require('http') ;
 const port = config.server.port;
 
-var ConfBridge = require ('./node-confbridge/lib/confbridge.js') 
+const ConfBridge = require ('./node-confbridge/lib/confbridge.js') 
 var endpointsThreshold = {};
 
 function registerNewEndpoint(name){
@@ -20,7 +20,8 @@ function registerNewEndpointIfNeeded(name){
 		registerNewEndpoint(name);
 		endpointsThreshold[name].state = false;
 		endpointsThreshold[name].listening = false;
-		endpointsThreshold[name].talking = true;
+		endpointsThreshold[name].speaker = true;
+		endpointsThreshold[name].talking = false;
 	}
 }
  
@@ -44,9 +45,9 @@ const requestHandler = (request, response) => {
 	else if(fragments[2]!= null && fragments[2] == "mute"){
 		var endpoint = fragments[1];
 		if(request.method == 'POST'){
-			endpointsThreshold[endpoint].talking = false;
+			endpointsThreshold[endpoint].speaker = false;
 		}
-		console.log("Set endpoint " + fragments[1] + " talking status " + endpointsThreshold[endpoint].talking);
+		console.log("Set endpoint " + fragments[1] + " talking status " + endpointsThreshold[endpoint].speaker);
 		success = true;
 	}
 	
@@ -54,9 +55,9 @@ const requestHandler = (request, response) => {
 	else if(fragments[2]!= null && fragments[2] == "talk"){
 		var endpoint = fragments[1];
 		if(request.method == 'POST'){
-			endpointsThreshold[endpoint].talking = true;
+			endpointsThreshold[endpoint].speaker = true;
 		}
-		console.log("Set endpoint " + fragments[1] + " talking status " + endpointsThreshold[endpoint].talking);
+		console.log("Set endpoint " + fragments[1] + " talking status " + endpointsThreshold[endpoint].speaker);
 		success = true;
 	}
 	
@@ -122,6 +123,7 @@ function clientLoaded (err, client) {
 	registerNewEndpointIfNeeded(channel.caller.name);
 	endpointsThreshold[channel.caller.name].state = true;
 	endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
+	endpointsThreshold[channel.caller.name].talking = true;
     console.log(util.format(
         'Channel talking started', channel.caller.name));
  
@@ -129,6 +131,7 @@ function clientLoaded (err, client) {
   
   function channeltalkingfinished(event, channel) {
 	endpointsThreshold[channel.caller.name].timestamp = event.timestamp;
+	endpointsThreshold[channel.caller.name].talking = false;
 	console.log(util.format(
         'Channel talking finished', channel.caller.name));
  
@@ -162,7 +165,7 @@ function clientLoaded (err, client) {
   }
   
   client.on('ChannelTalkingStarted', channeltalkingstarted)
-  client.on('ChannelTalkingStarted', channeltalkingfinished)
+  client.on('ChannelTalkingFinished', channeltalkingfinished)
   client.on('ChannelStateChange', channelStateChanged)
   client.on('StasisStart', stasisStart);
   client.on('StasisEnd', stasisEnd);
