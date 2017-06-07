@@ -54,7 +54,6 @@ function createHeadRow(){
 	tr.append($("<th/>",{html:"Speaker"}));
 	tr.append($("<th/>",{html:"Naam"}));
 	tr.append($("<th/>",{html:"Status"}));
-	tr.append($("<th/>",{html:"Activiteit"}));
 	tr.append($("<th/>",{html:"Bevestig"}));
 	tr.append($("<th/>",{html:"Laatst actief"}));
 	return tr;
@@ -76,7 +75,6 @@ function createEndpointRow(endpoint){
 	tr.append(createEndpointMuteButtonColumn(endpoint));
 	tr.append(createEndpointIdentifierColumn(endpoint));
 	tr.append(createEndpointListeningStateColumn(endpoint));
-	tr.append(createEndpointActivityStatusColumn(endpoint));
 	tr.append(createEndpointAcknowledgeButtonColumn(endpoint));
 	tr.append(createTimestampColumn(endpoint));
 	if(endpoint.audience){
@@ -104,10 +102,6 @@ function createEndpointIdentifierColumn(endpoint){
 
 function createEndpointListeningStateColumn(endpoint){
 	return $( "<td/>",{"class":"endpoint_listeningstatus",html:endpoint.listening?"online":"offline"});
-}
-
-function createEndpointActivityStatusColumn(endpoint){
-	return $( "<td/>",{"class":"endpoint_activitystatus" ,html:endpoint.listening?1:0});
 }
 
 function createEndpointAcknowledgeButtonColumn(endpoint){
